@@ -11,7 +11,6 @@ def main():
         print("No website URL found. Please run the first script.")
 
     webwithouthttp = website_checker_url
-    print(webwithouthttp)
     jsonrequest = requests.get(f"https://whatcms.org/API/Tech?key={apikey}&url={webwithouthttp}")
     
     parsed_data = jsonrequest.json()
