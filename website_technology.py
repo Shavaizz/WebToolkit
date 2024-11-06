@@ -3,23 +3,51 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 apikey = os.environ['apikey']
+
 def main():
+    if not apikey:
+        print("Error: API key is missing. Please make sure the API key is set in your .env file.")
+        return
+
     try:
         with open("website.txt", "r") as file:
             website_checker_url = file.read().strip()
-    except FileNotFoundError:
-        print("No website URL found. Please run the first script.")
 
-    webwithouthttp = website_checker_url
-    jsonrequest = requests.get(f"https://whatcms.org/API/Tech?key={apikey}&url={webwithouthttp}")
+        if not website_checker_url:
+            print("Error: The website URL in 'website.txt' is empty. Please add a valid URL.")
+            return
+    except FileNotFoundError:
+        print("Error: 'website.txt' not found. Please make sure the file exists.")
+        return
+    except Exception as e:
+        print(f"Unexpected error reading 'website.txt': {e}")
+        return
+
+    try:
+        webwithouthttp = website_checker_url.lstrip("http://").lstrip("https://")
+        
+        response = requests.get(f"https://whatcms.org/API/Tech?key={apikey}&url={webwithouthttp}")
+        response.raise_for_status()
+        parsed_data = response.json()
+        if 'result' in parsed_data and parsed_data['result'].get('code') == 200:
+            results = parsed_data.get('results', [])
+            if not results:
+                print("No technologies detected for this website.")
+            else:
+                print("Technologies Detected: ")
+                for technology in results:
+                    name = technology.get('name', 'Unknown')
+                    version = technology.get('version', 'N/A')
+                    category = technology.get('categories', 'N/A')
+                    print(f"Name: {name}, Version: {version}, Used As: {category}")
+        else:
+            print(f"Error: Failed to retrieve valid technology information (Code: {parsed_data['result'].get('code', 'N/A')})")
     
-    parsed_data = jsonrequest.json()
-    print("Technologies Detected: ")
-    if 'result' in parsed_data and parsed_data['result']['code'] == 200:
-        for technology in parsed_data.get('results',[]):
-            name = technology.get('name', 'Unknown')
-            version = technology.get('version', 'N/A')
-            category = technology.get('categories', 'N/A')
-            print(f"Name:{name}, Version:{version}, Used As: {category}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: Failed to make request to API. Details: {e}")
+    except ValueError:
+        print("Error: Failed to parse JSON response from the API.")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
 if __name__ == "__main__":
     main()
