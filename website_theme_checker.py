@@ -26,7 +26,7 @@ def main():
 
     
     try:
-        webwithouthttp = website_checker_url.lstrip("http://").lstrip("https://")
+        webwithouthttp = website_checker_url
         response = requests.get(f"https://www.themedetect.com/API/Theme?url={webwithouthttp}&key={apikey}")
 
         response.raise_for_status()
@@ -44,6 +44,8 @@ def main():
                     name = technology.get('theme_name', 'Unknown')
                     license = technology.get('license', 'Unknown')
                     print(f"Theme Name: {name}, Version: {license}")
+        elif 'result' in parsed_data and parsed_data['result'].get('code') == 203:
+            print("This is not a WordPress powered website and thus a theme check can not be done")
         else:
             print(f"Error: Failed to retrieve valid theme information (Code: {parsed_data['result'].get('code', 'N/A')})")
     except requests.exceptions.RequestException as e:

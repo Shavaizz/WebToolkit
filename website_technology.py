@@ -24,7 +24,7 @@ def main():
         return
 
     try:
-        webwithouthttp = website_checker_url.lstrip("http://").lstrip("https://")
+        webwithouthttp = website_checker_url
         
         response = requests.get(f"https://whatcms.org/API/Tech?key={apikey}&url={webwithouthttp}")
         response.raise_for_status()
