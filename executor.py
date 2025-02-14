@@ -6,9 +6,9 @@ from domainage import main as domainage
 import time
 webstatus()
 webhost()
+domainage()
 webtech()
 print("Waiting For API cooldown")
 time.sleep(10)
 print("Api Refreshed")
 webtheme()
-domainage()
