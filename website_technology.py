@@ -25,7 +25,6 @@ def main():
 
     try:
         webwithouthttp = website_checker_url
-        
         response = requests.get(f"https://whatcms.org/API/Tech?key={apikey}&url={webwithouthttp}")
         response.raise_for_status()
         parsed_data = response.json()
