@@ -1,5 +1,7 @@
 import requests
 from dotenv import load_dotenv
+from website_theme_checker import main as webtheme
+import time
 load_dotenv()
 import os
 apikey = os.environ['apikey']
@@ -28,6 +30,7 @@ def main():
         response = requests.get(f"https://whatcms.org/API/Tech?key={apikey}&url={webwithouthttp}")
         response.raise_for_status()
         parsed_data = response.json()
+        wordpress_found = False
         if 'result' in parsed_data and parsed_data['result'].get('code') == 200:
             results = parsed_data.get('results', [])
             if not results:
@@ -39,6 +42,14 @@ def main():
                     version = technology.get('version', 'N/A')
                     category = technology.get('categories', 'N/A')
                     print(f"Name: {name}, Version: {version}, Used As: {category}")
+                    if name == "WordPress":
+                        wordpress_found = True
+                if wordpress_found:
+                    print("Theme Detection Activated")
+                    time.sleep(10)
+                    webtheme()
+                else:
+                    return
         else:
             print(f"Error: Failed to retrieve valid technology information (Code: {parsed_data['result'].get('code', 'N/A')})")
     
